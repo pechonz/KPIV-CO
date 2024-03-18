@@ -1,0 +1,267 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<style>
+    .item {
+        font-weight: 600;
+        margin-bottom: 0.1rem;
+        height: 24px;
+    }
+    .process {
+        font-weight: 600;
+        margin-bottom: 0.1rem;
+        height: 24px;
+    }
+    .btn-circle {
+        width: 45px;
+        height: 45px;
+        line-height: 45px;
+        text-align: center;
+        padding: 0;
+        border-radius: 50%;
+    }
+</style>
+
+<main>
+    <div class="container-fluid text-center">
+        <div id="boxDiv" class="row row-cols-2 row-cols-lg-6 row-cols-md-4 g-2 g-lg-3"></div>
+    </div>
+</main>
+
+<div id="trModal" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="itemcd" class="form-label">Itemcd</label>
+                        <input type="text" class="form-control" id="itemcd">
+
+                        <label for="qty" class="form-label">Quantity</label>
+                        <input type="text" class="form-control" id="qty">
+
+                        <label for="cabinetno" class="form-label">Cabinet No.</label>
+                        <select id="cabinetno" class="form-select" disabled>
+                            <option selected></option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                        </select>
+
+                        <label for="cabinetlayer" class="form-label">Cabinet Layer</label>
+                        <select id="cabinetlayer" class="form-select" disabled>
+                            <option selected></option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+
+                        <label for="cabinetside" class="form-label">Cabinet Side</label>
+                        <select id="cabinetside" class="form-select" disabled>
+                            <option selected></option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="side" class="form-label">Side</label>
+                        <select id="side" class="form-select">
+                            <option selected></option>
+                            <option value="R1">R1</option>
+                            <option value="R2">R2</option>
+                            <option value="R1R2">R1 and R2</option>
+                        </select>
+
+                        <label for="worker" class="form-label">Worker</label>
+                        <input type="text" class="form-control" id="worker">
+                    </div>
+                    <div class="col-md-4">
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="machineno" class="form-label">Machine No.</label>
+                        <select id="machineno" class="form-select"></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="lotno" class="form-label">Lotno</label>
+                        <input type="text" class="form-control" id="lotno" onchange="getStatus(this.value)">
+                    </div>
+                    <div class="col-md-4">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-success"><i class="fa-solid fa-check"></i></button>
+                <button class="btn btn-danger"><i class="fa-solid fa-xmark"></i></button>
+                <button class="btn btn-warning"><i class="fa-solid fa-recycle"></i></button>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success">In</button>
+                <button type="button" class="btn btn-danger">Out</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link href="~/Content/fontawesome-free-6.5.1-web/css/all.css" rel="stylesheet" />
+<link href="~/Content/bootstrap.css" rel="stylesheet" />
+<script src="~/Content/fontawesome-free-6.5.1-web/js/all.js"></script>
+<script src="~/Scripts/bootstrap.js"></script>
+<script src="~/Scripts/fusioncharts.js"></script>
+<script src="~/Scripts/fusioncharts.theme.fusion.js"></script>
+<script src="~/Scripts/moment.js"></script>
+<script src="~/Scripts/jquery-3.7.1.js"></script>
+<script src="~/Scripts/datatables.js"></script>
+<script src="~/Scripts/jquery-ui.min.js"></script>
+<script src="~/Scripts/pdfmake.js"></script>
+<script src="~/Scripts/vfs_fonts.js"></script>
+
+<script>
+    var layer = [1,2,3]
+    var side = ['A','B']
+    var ledstatus = []
+
+    $(document).ready(function () {
+        getMachine()
+    })
+
+    setInterval(function () {
+        getCabinetStatus()
+        generateCabinetDiv()
+    }, 1000)
+
+    function getMachine() {
+        var machineDiv = "<option selected></option>"
+        $.getJSON("@Url.Action("getMACHINE", "Home")", { "val": "" }, function (item) {
+            $.each(item, function (index, data) {
+                machineDiv += " <option value='" + data.MACHINENAME + "'>" + data.MACHINENAME +"</option> ";
+            })
+            document.getElementById("machineno").innerHTML = machineDiv
+        })
+    }
+
+    function getStatus(lotno) {
+        $.getJSON("@Url.Action("getSTATUS", "Home")", { "lotno": lotno }, function (item) {
+            if (item.length > 0) {
+                $.each(item, function (index, data) {
+                    $('#itemcd').val(data.MAINITEMCD)
+                    $('#qty').val(data.RECISSUEQTY)
+                    $('#side').val(data.ITEMSIDECD)
+                    $('#machineno').val(data.MACHINENAME)
+                })
+            }
+            else {
+                $.getJSON("@Url.Action("getMAINITEM", "Home")", { "lotno": lotno }, function (item) {
+                    if (item.length > 0) {
+                        $.each(item, function (index, data) {
+                            $('#itemcd').val(data.MAINITEMCD)
+                        })
+                    }
+                    else {
+                        alert("Lens not in CO or CO2")
+                        $('#lotno').val('')
+                    }
+                })
+            }
+        })
+    }
+
+    function generateCabinetDiv() {
+        var boxDiv = ""
+        $.getJSON("@Url.Action("getCABINET", "Home")", { "val": "" }, function (item) {
+            $.each(item, function (index, data) {
+                boxDiv += " <div class='col'> ";
+                boxDiv += "     <div class='card'> ";
+                boxDiv += "         <div class='card-header'>Cabinet " + data.CABINETCD + "</div> ";
+                boxDiv += "         <ul class='list-group list-group-flush'> ";
+                for (var i = 0; i < layer.length; i++) {
+                    let sideA = ledstatus.filter(key => key.CABINETCD === (data.CABINETCD).toString() && key.LAYERCD === (layer[i]).toString() && key.SIDECD === "A")
+                    let sideB = ledstatus.filter(key => key.CABINETCD === (data.CABINETCD).toString() && key.LAYERCD === (layer[i]).toString() && key.SIDECD === "B")
+
+                    boxDiv += "             <li class='list-group-item' style='padding:0px'> ";
+                    boxDiv += "                 <div class='row'> ";
+                    boxDiv += "                     @*Side A Layer1*@ ";
+                    boxDiv += "                     <div class='col' style='border-right: 1px solid #D2D2D2; padding-right:0px'> ";
+                    if (sideA.length > 0) {
+                        boxDiv += " 	                    <p id='" + data.CABINETCD + "_" + layer[i] + "_A_Item' style='padding:.5rem;margin-bottom:1rem' class='text-center item'>" + sideA[0].MAINITEMCD +"</p> ";
+                        boxDiv += "                         <div id='" + data.CABINETCD + "_" + layer[i] + "_A_Status' class='led-yellow button' role='button' onclick='clickStatus(this)'></div> "
+                        boxDiv += "                         <p id='" + data.CABINETCD + "_" + layer[i] + "_A_Subprocess' style='padding:.5rem;margin-bottom:.5rem' class='text-center process'>" + sideA[0].LOCATIONCD +"</p> ";
+                    }
+                    else {
+                        boxDiv += " 	                    <p id='" + data.CABINETCD + "_" + layer[i] + "_A_Item' style='padding:.5rem;margin-bottom:1rem' class='text-center item'></p> ";
+                        boxDiv += "                         <div id='" + data.CABINETCD + "_" + layer[i] + "_A_Status' class='led-green button' role='button' onclick='clickStatus(this)'></div> "
+                        boxDiv += "                         <p id='" + data.CABINETCD + "_" + layer[i] + "_A_Subprocess' style='padding:.5rem;margin-bottom:1rem' class='text-center process'></p> ";
+                    }
+                    boxDiv += "                     </div> ";
+                    boxDiv += "                     @*Side B Layer1*@ ";
+                    boxDiv += "                     <div class='col' style='padding-left:0px'> ";
+                    
+                    if (sideB.length > 0) {
+                        boxDiv += " 	                    <p id='" + data.CABINETCD + "_" + layer[i] + "_B_Item' style='padding:.5rem;margin-bottom:1rem' class='text-center item'>" + sideB[0].MAINITEMCD + "</p> ";
+                        boxDiv += "                         <div id='" + data.CABINETCD + "_" + layer[i] + "_B_Status' class='led-yellow button' role='button' onclick='clickStatus(this)'></div> "
+                        boxDiv += "                         <p id='" + data.CABINETCD + "_" + layer[i] + "_B_Subprocess' style='padding:.5rem;margin-bottom:.5rem' class='text-center process'>" + sideB[0].LOCATIONCD + "</p> ";
+                    }
+                    else {
+                        boxDiv += " 	                    <p id='" + data.CABINETCD + "_" + layer[i] + "_B_Item' style='padding:.5rem;margin-bottom:1rem' class='text-center item'></p> ";
+                        boxDiv += "                         <div id='" + data.CABINETCD + "_" + layer[i] + "_B_Status' class='led-green button' role='button' onclick='clickStatus(this)'></div> "
+                        boxDiv += "                         <p id='" + data.CABINETCD + "_" + layer[i] + "_B_Subprocess' style='padding:.5rem;margin-bottom:1rem' class='text-center process'></p> ";
+                    }
+                    
+                    boxDiv += "                     </div> ";
+                    boxDiv += "                 </div> ";
+                    boxDiv += "             </li> ";
+                }
+                boxDiv += "         </ul> ";
+                boxDiv += "     </div> ";
+                boxDiv += " </div> ";
+            })
+            document.getElementById("boxDiv").innerHTML = boxDiv
+        })
+    }
+
+    function getCabinetStatus(cabinet, layer, side) {
+        $.getJSON("@Url.Action("getCabinetStatus", "Home")", { "val": "" }, function (item) {
+            ledstatus = item
+        })
+    }
+
+    function clickStatus(obj) {
+        arr = (obj.id).split("_")
+        $('#trModal').modal('toggle')
+
+        let status = ledstatus.filter(key => key.CABINETCD === arr[0] && key.LAYERCD === arr[1] && key.SIDECD === arr[2])
+
+        $('#itemcd').val(status[0].MAINITEMCD)
+        $('#qty').val(status[0].RECISSUEQTY)
+        $('#side').val(status[0].ITEMSIDECD)
+        $('#machineno').val(status[0].MACHINENAME)
+
+        $('#lotno').val(status[0].LOTNO)
+
+        /*alert(obj.id)*/
+        $('#cabinetno').val(arr[0])
+        $('#cabinetlayer').val(arr[1])
+        $('#cabinetside').val(arr[2])
+        /*console.log(arr)*/
+    }
+
+</script>

@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <link rel="shortcut icon" type="image/png" href="~/Images/logo2.png" />
+    <link href="~/Content/AlarmLED.css" rel="stylesheet" />
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body style="font-family:'Century Gothic';">
+    <nav class="navbar navbar-expand" style="background-color: #F2663F; color: white; padding: 0px ">
+        <div class="container-fluid">
+            @*<a class="navbar-brand" href="@Url.Action("Index", "Home")" style="font-size:30px; color:#44A4FF; font-weight:bold;"><img src="~/images/hoptlogo.png" style="width:100px;"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>*@
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <a class="navbar-brand" href="@Url.Action("Index", "Home")" style="font-size:30px; color:#44A4FF; font-weight:bold;"><img src="~/images/hoptlogo.png" style="width:100px;"></a>
+            </ul>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="@Url.Action("Index", "Home")">KPIV-CO</a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="@Url.Action("Index", "Home")" data-placement="top" title="Lens Cabinet"><i class="fa-solid fa-bolt-lightning"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="@Url.Action("Index", "Analyze")" data-placement="top" title="Analyze"><i class="fa-solid fa-chart-line"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="@Url.Action("Index", "WorkList")" data-placement="top" title="Work list control"><i class="fa-solid fa-list-check"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="@Url.Action("Index", "Calibrate")" data-placement="top" title="Calibrate"><i class="fa-solid fa-gauge"></i></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container-fluid body-content" style="margin-top:8px">
+        @RenderBody()
+        <br />
+        <br />
+        <br />
+        <div class="text-center fixed-bottom" style="padding: 5px; background-color: #F2663F ">
+            <p class="text-center" style="margin:0px;font-size:12px">HOYA OPTICS(THAILAND) LTD. © 2024</p>
+            <p class="text-center" style="margin:0px;font-size:10px">Develop by Naruephon Sooksinchai (GMO-AT Develop)</p>
+        </div>
+    </div>
+    
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
